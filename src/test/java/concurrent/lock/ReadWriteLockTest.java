@@ -58,6 +58,22 @@ public class ReadWriteLockTest {
     }
 
     @Test
+    public void acquireWriteLockTwice() {
+        boolean canAcquireWriteLock = writeLock.tryLock();
+
+        try {
+            assertThat(canAcquireWriteLock).isTrue();
+            Thread t = new Thread(() -> {
+                boolean canAcquireSecondWriteLock = writeLock.tryLock();
+                assertThat(canAcquireSecondWriteLock).isFalse();
+            });
+            t.start();
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @Test
     public void doUnLockMoreThanLock() {
         assertThatCode(() -> {
             int lockCount = 3;
